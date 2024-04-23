@@ -1,10 +1,17 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useToast } from 'primevue/usetoast'
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { useRouter } from 'vue-router'
+
+const toast = useToast()
 
 const isLogin = ref<boolean>(true)
 const isLoading = ref<boolean>(false)
 const email = ref<string>('')
 const password = ref<string>('')
+
+const router = useRouter()
 
 const toggleAuth = () => {
   isLogin.value = !isLogin.value
@@ -22,8 +29,22 @@ const submitButtonText = computed<string>(() => {
   return isLogin.value ? 'Sign In' : 'Registration'
 })
 
+const signUp = async (): Promise<void> => {
+  isLoading.value = true
+  try {
+    await createUserWithEmailAndPassword(getAuth(), email.value, password.value)
+    router.push('/')
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 })
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
 const submitForm = (): void => {
-  console.log('test')
+  signUp()
 }
 </script>
 
