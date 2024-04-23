@@ -42,9 +42,26 @@ const signUp = async (): Promise<void> => {
     isLoading.value = false
   }
 }
+const signIn = async (): Promise<void> => {
+  isLoading.value = true
+  try {
+    await signInWithEmailAndPassword(getAuth(), email.value, password.value)
+    router.push('/')
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      toast.add({ severity: 'error', summary: 'Error', detail: error.message, life: 3000 })
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
 
 const submitForm = (): void => {
-  signUp()
+  if (isLogin.value) {
+    signIn()
+  } else {
+    signUp()
+  }
 }
 </script>
 
