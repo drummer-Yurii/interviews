@@ -11,9 +11,11 @@ import {
 } from 'firebase/firestore'
 import { useUserStore } from '@/stores/user'
 import type { IInterview } from '@/interfaces'
+import { useConfirm } from 'primevue/useconfirm'
 
 const userStore = useUserStore()
 const db = getFirestore()
+const confirm = useConfirm()
 
 const interviews = ref<IInterview[]>([])
 const isLoading = ref<boolean>(true)
@@ -27,6 +29,23 @@ const getAllInterviews = async <T extends IInterview>(): Promise<T[]> => {
   return listDocs.docs.map((doc) => doc.data() as T)
 }
 
+const confirmRemoveInterview = async (id: string): Promise<void> => {
+  confirm.require({
+    message: 'Are you sure you want to remove the interview?',
+    header: 'Removing inteviews',
+    icon: 'pi pi-info-circle',
+    rejectLabel: 'Cancellation',
+    acceptLabel: 'Remove',
+    rejectClass: 'p-button-secondary p-button-outlined',
+    acceptClass: 'p-button-danger',
+    accept: async () => {
+      isLoading.value = true
+      await deleteDoc(doc(db, `users/${userStore.userId}/interviews`, id))
+      isLoading.value = false
+    }
+  })
+}
+
 onMounted(async () => {
   const listInterviews: Array<IInterview> = await getAllInterviews()
   interviews.value = [...listInterviews]
@@ -34,6 +53,7 @@ onMounted(async () => {
 </script>
 
 <template>
+  <app-dialog />
   <h1>List of interviews</h1>
   <app-datatable :value="interviews">
     <app-column field="company" header="Company"></app-column>
@@ -70,6 +90,20 @@ onMounted(async () => {
           >
             <span class="contacts__icon pi pi-phone"></span>
           </a>
+        </div>
+      </template>
+    </app-column>
+    <app-column>
+      <template #body="slotProps">
+        <div class="flex gap-2">
+          <router-link :to="`/interview/${slotProps.data.id}`">
+            <app-button icon="pi pi-pencil" severity="info" />
+          </router-link>
+          <app-button
+            icon="pi pi-trash"
+            severity="danger"
+            @click="confirmRemoveInterview(slotProps.data.id)"
+          />
         </div>
       </template>
     </app-column>
