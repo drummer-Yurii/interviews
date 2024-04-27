@@ -19,6 +19,7 @@ import Card from 'primevue/card';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import ConfirmDialog from 'primevue/confirmdialog';
+import InlineMessage from 'primevue/inlinemessage';
 
 import App from './App.vue'
 import router from './router'
@@ -50,5 +51,6 @@ app.component('app-card', Card)
 app.component('app-datatable', DataTable)
 app.component('app-column', Column)
 app.component('app-dialog', ConfirmDialog)
+app.component('app-message', InlineMessage)
 
 app.mount('#app')

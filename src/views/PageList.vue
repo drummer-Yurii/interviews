@@ -41,6 +41,8 @@ const confirmRemoveInterview = async (id: string): Promise<void> => {
     accept: async () => {
       isLoading.value = true
       await deleteDoc(doc(db, `users/${userStore.userId}/interviews`, id))
+      const listInterviews: Array<IInterview> = await getAllInterviews()
+      interviews.value = [...listInterviews]
       isLoading.value = false
     }
   })
@@ -49,65 +51,70 @@ const confirmRemoveInterview = async (id: string): Promise<void> => {
 onMounted(async () => {
   const listInterviews: Array<IInterview> = await getAllInterviews()
   interviews.value = [...listInterviews]
+  isLoading.value = false
 })
 </script>
 
 <template>
   <app-dialog />
-  <h1>List of interviews</h1>
-  <app-datatable :value="interviews">
-    <app-column field="company" header="Company"></app-column>
-    <app-column field="hrName" header="Name HR"></app-column>
-    <app-column field="vacancyLink" header="Vacancy">
-      <template #body="slotProps">
-        <a :href="slotProps.data.vacancyLink" target="_blank">{{ slotProps.data.vacancyLink }}</a>
-      </template>
-    </app-column>
-    <app-column header="Contacts">
-      <template #body="slotProps">
-        <div class="contacts">
-          <a
-            v-if="slotProps.data.contactTelegram"
-            :href="`https://t.me/${slotProps.data.contactTelegram}`"
-            target="_blank"
-            class="contacts__telegram"
-          >
-            <span class="contacts__icon pi pi-telegram"></span>
-          </a>
-          <a
-            v-if="slotProps.data.contactWhatsApp"
-            :href="`https://wa.me/${slotProps.data.contactWhatsApp}`"
-            target="_blank"
-            class="contacts__whatsapp"
-          >
-            <span class="contacts__icon pi pi-whatsapp"></span>
-          </a>
-          <a
-            v-if="slotProps.data.contactPhone"
-            :href="`https://tel:${slotProps.data.contactPhone}`"
-            target="_blank"
-            class="contacts__phone"
-          >
-            <span class="contacts__icon pi pi-phone"></span>
-          </a>
-        </div>
-      </template>
-    </app-column>
-    <app-column>
-      <template #body="slotProps">
-        <div class="flex gap-2">
-          <router-link :to="`/interview/${slotProps.data.id}`">
-            <app-button icon="pi pi-pencil" severity="info" />
-          </router-link>
-          <app-button
-            icon="pi pi-trash"
-            severity="danger"
-            @click="confirmRemoveInterview(slotProps.data.id)"
-          />
-        </div>
-      </template>
-    </app-column>
-  </app-datatable>
+  <app-progress v-if="isLoading" />
+  <app-message v-else-if="!isLoading && !interviews.length" severity="info">No added interviews!</app-message>
+  <div v-else>
+    <h1>List of interviews</h1>
+    <app-datatable :value="interviews">
+      <app-column field="company" header="Company"></app-column>
+      <app-column field="hrName" header="Name HR"></app-column>
+      <app-column field="vacancyLink" header="Vacancy">
+        <template #body="slotProps">
+          <a :href="slotProps.data.vacancyLink" target="_blank">{{ slotProps.data.vacancyLink }}</a>
+        </template>
+      </app-column>
+      <app-column header="Contacts">
+        <template #body="slotProps">
+          <div class="contacts">
+            <a
+              v-if="slotProps.data.contactTelegram"
+              :href="`https://t.me/${slotProps.data.contactTelegram}`"
+              target="_blank"
+              class="contacts__telegram"
+            >
+              <span class="contacts__icon pi pi-telegram"></span>
+            </a>
+            <a
+              v-if="slotProps.data.contactWhatsApp"
+              :href="`https://wa.me/${slotProps.data.contactWhatsApp}`"
+              target="_blank"
+              class="contacts__whatsapp"
+            >
+              <span class="contacts__icon pi pi-whatsapp"></span>
+            </a>
+            <a
+              v-if="slotProps.data.contactPhone"
+              :href="`https://tel:${slotProps.data.contactPhone}`"
+              target="_blank"
+              class="contacts__phone"
+            >
+              <span class="contacts__icon pi pi-phone"></span>
+            </a>
+          </div>
+        </template>
+      </app-column>
+      <app-column>
+        <template #body="slotProps">
+          <div class="flex gap-2">
+            <router-link :to="`/interview/${slotProps.data.id}`">
+              <app-button icon="pi pi-pencil" severity="info" />
+            </router-link>
+            <app-button
+              icon="pi pi-trash"
+              severity="danger"
+              @click="confirmRemoveInterview(slotProps.data.id)"
+            />
+          </div>
+        </template>
+      </app-column>
+    </app-datatable>
+  </div>
 </template>
 
 <style scoped>
