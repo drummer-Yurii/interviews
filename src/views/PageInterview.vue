@@ -40,6 +40,32 @@
                     </div>
                 </div>
                 <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" />
+                <div class="interview-stage">
+                    <div class="flex flex-column gap-2">
+                        <label for="stageName">Name stage</label>
+                        <app-input-text class="input mb-3" id="stageName" />
+                    </div>
+                    <div class="flex flex-column gap-2">
+                        <label for="stageCalendar">Date of completion of the stage</label>
+                        <app-calendar class="input mb-3" id="stageCalendar" dateFormat="dd.mm.yy" />
+                    </div>
+                    <div class="flex flex-column gap-2">
+                        <label for="stageDescription">Comment</label>
+                        <app-textarea id="stageDescription" class="input mb-3" rows="5" />
+                    </div>
+                    <app-button severity="danger" label="Delete stage" />
+                </div>
+                <div class="flex flex-wrap gap-3 mb-3">
+                    <div class="flex align-items-center">
+                        <app-radio inputId="interviewResult1" name="result" value="Refusal" />
+                        <label for="interviewResult1" class="ml-2">Refusal</label>
+                    </div>
+                    <div class="flex align-items-center">
+                        <app-radio inputId="interviewResult2" name="result" value="Offer" />
+                        <label for="interviewResult2" class="ml-2">Offer</label>
+                    </div>
+                </div>
+                <app-button label="Save" icon="pi pi-save" />
             </template>
         </app-card>
     </div>
