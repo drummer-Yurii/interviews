@@ -1,5 +1,25 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router';
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
+import { useUserStore } from '@/stores/user';
+import { IInterview } from '@/interfaces';
 
+const db = getFirestore()
+const userStore = useUserStore()
+const route = useRoute()
+
+const interview = ref<IInterview>()
+
+const docref = doc(db, `users/${userStore.userId}/interviews`, route.params.id as string)
+
+const getData = async (): Promise<void> => {
+    const docSnap = await getDoc(docref)
+    interview.value = docSnap.data() as IInterview
+    console.log(interview.value);
+}
+
+onMounted(async () => await getData())
 </script>
 
 <template>
