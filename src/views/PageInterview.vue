@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { useRoute } from 'vue-router';
-import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
-import { useUserStore } from '@/stores/user';
-import { IInterview } from '@/interfaces';
+import { useRoute } from 'vue-router'
+import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore'
+import { useUserStore } from '@/stores/user'
+import { IInterview } from '@/interfaces'
 
 const db = getFirestore()
 const userStore = useUserStore()
@@ -15,100 +15,116 @@ const interview = ref<IInterview>()
 const docref = doc(db, `users/${userStore.userId}/interviews`, route.params.id as string)
 
 const getData = async (): Promise<void> => {
-    isLoading.value = true
-    const docSnap = await getDoc(docref)
-    interview.value = docSnap.data() as IInterview
-    isLoading.value = false
-    console.log(interview.value);
+  isLoading.value = true
+  const docSnap = await getDoc(docref)
+  interview.value = docSnap.data() as IInterview
+  isLoading.value = false
+  console.log(interview.value)
 }
 
 onMounted(async () => await getData())
 </script>
 
 <template>
-    <app-progress v-if="isLoading" />
-    <div class="content-interview" v-else-if="interview?.id && !isLoading">
-        <app-card>
-            <template #title>Interview at the company {{ interview.company}}</template>
-            <template #content>
-                <div class="flex flex-column gap-2">
-                    <label for="company">Company</label>
-                    <app-input-text class="input mb-3" id="company" v-model="interview.company" />
-                </div>
-                <div class="flex flex-column gap-2">
-                    <label for="vacancyLink">Vacancy description (link)</label>
-                    <app-input-text class="input mb-3" id="vacancyLink" v-model="interview.vacancyLink" />
-                </div>
-                <div class="flex flex-column gap-2">
-                    <label for="hrName">Contact (name)</label>
-                    <app-input-text class="input mb-3" id="hrName" v-model="interview.hrName" />
-                </div>
-                <div class="flex flex-column gap-2">
-                    <label for="contactTelegram">Telegram username HR</label>
-                    <app-input-text class="input mb-3" id="contactTelegram" v-model="interview.contactTelegram" />
-                </div>
-                <div class="flex flex-column gap-2">
-                    <label for="contactWhatsApp">WhatsApp HR</label>
-                    <app-input-text class="input mb-3" id="contactWhatsApp" v-model="interview.contactWhatsApp" />
-                </div>
-                <div class="flex flex-column gap-2">
-                    <label for="contactPhone">Phone HR</label>
-                    <app-input-text class="input mb-3" id="contactPhone" v-model="interview.contactPhone" />
-                </div>
-                <div class="flex flex-wrap gap-3 p-fluid mb-3">
-                    <div class="flex-auto">
-                        <app-input-number inputId="salaryFrom" placeholder="Salary range from" />
-                    </div>
-                    <div class="flex-auto">
-                        <app-input-number inputId="salaryTo" placeholder="Salary range to" />
-                    </div>
-                </div>
-                <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" />
-                <div class="interview-stage">
-                    <div class="flex flex-column gap-2">
-                        <label for="stageName">Name stage</label>
-                        <app-input-text class="input mb-3" id="stageName" />
-                    </div>
-                    <div class="flex flex-column gap-2">
-                        <label for="stageCalendar">Date of completion of the stage</label>
-                        <app-calendar class="input mb-3" id="stageCalendar" dateFormat="dd.mm.yy" />
-                    </div>
-                    <div class="flex flex-column gap-2">
-                        <label for="stageDescription">Comment</label>
-                        <app-textarea id="stageDescription" class="input mb-3" rows="5" />
-                    </div>
-                    <app-button severity="danger" label="Delete stage" />
-                </div>
-                <div class="flex flex-wrap gap-3 mb-3">
-                    <div class="flex align-items-center">
-                        <app-radio inputId="interviewResult1" name="result" value="Refusal" />
-                        <label for="interviewResult1" class="ml-2">Refusal</label>
-                    </div>
-                    <div class="flex align-items-center">
-                        <app-radio inputId="interviewResult2" name="result" value="Offer" />
-                        <label for="interviewResult2" class="ml-2">Offer</label>
-                    </div>
-                </div>
-                <app-button label="Save" icon="pi pi-save" />
-            </template>
-        </app-card>
-    </div>
+  <app-progress v-if="isLoading" />
+  <div class="content-interview" v-else-if="interview?.id && !isLoading">
+    <app-card>
+      <template #title>Interview at the company {{ interview.company }}</template>
+      <template #content>
+        <div class="flex flex-column gap-2">
+          <label for="company">Company</label>
+          <app-input-text class="input mb-3" id="company" v-model="interview.company" />
+        </div>
+        <div class="flex flex-column gap-2">
+          <label for="vacancyLink">Vacancy description (link)</label>
+          <app-input-text class="input mb-3" id="vacancyLink" v-model="interview.vacancyLink" />
+        </div>
+        <div class="flex flex-column gap-2">
+          <label for="hrName">Contact (name)</label>
+          <app-input-text class="input mb-3" id="hrName" v-model="interview.hrName" />
+        </div>
+        <div class="flex flex-column gap-2">
+          <label for="contactTelegram">Telegram username HR</label>
+          <app-input-text
+            class="input mb-3"
+            id="contactTelegram"
+            v-model="interview.contactTelegram"
+          />
+        </div>
+        <div class="flex flex-column gap-2">
+          <label for="contactWhatsApp">WhatsApp HR</label>
+          <app-input-text
+            class="input mb-3"
+            id="contactWhatsApp"
+            v-model="interview.contactWhatsApp"
+          />
+        </div>
+        <div class="flex flex-column gap-2">
+          <label for="contactPhone">Phone HR</label>
+          <app-input-text class="input mb-3" id="contactPhone" v-model="interview.contactPhone" />
+        </div>
+        <div class="flex flex-wrap gap-3 p-fluid mb-3">
+          <div class="flex-auto">
+            <app-input-number
+              inputId="salaryFrom"
+              placeholder="Salary range from"
+              v-model="interview.salaryFrom"
+            />
+          </div>
+          <div class="flex-auto">
+            <app-input-number
+              inputId="salaryTo"
+              placeholder="Salary range to"
+              v-model="interview.salaryTo"
+            />
+          </div>
+        </div>
+        <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" />
+        <div class="interview-stage">
+          <div class="flex flex-column gap-2">
+            <label for="stageName">Name stage</label>
+            <app-input-text class="input mb-3" id="stageName" />
+          </div>
+          <div class="flex flex-column gap-2">
+            <label for="stageCalendar">Date of completion of the stage</label>
+            <app-calendar class="input mb-3" id="stageCalendar" dateFormat="dd.mm.yy" />
+          </div>
+          <div class="flex flex-column gap-2">
+            <label for="stageDescription">Comment</label>
+            <app-textarea id="stageDescription" class="input mb-3" rows="5" />
+          </div>
+          <app-button severity="danger" label="Delete stage" />
+        </div>
+        <div class="flex flex-wrap gap-3 mb-3">
+          <div class="flex align-items-center">
+            <app-radio inputId="interviewResult1" name="result" value="Refusal" />
+            <label for="interviewResult1" class="ml-2">Refusal</label>
+          </div>
+          <div class="flex align-items-center">
+            <app-radio inputId="interviewResult2" name="result" value="Offer" />
+            <label for="interviewResult2" class="ml-2">Offer</label>
+          </div>
+        </div>
+        <app-button label="Save" icon="pi pi-save" />
+      </template>
+    </app-card>
+  </div>
 </template>
 
 <style scoped>
 .content-interview {
-    max-width: 600px;
-    margin: auto;
+  max-width: 600px;
+  margin: auto;
 }
 
 .input {
-    width: 100%;
+  width: 100%;
 }
 
 .interview-stage {
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    padding: 10px;
-    margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 10px;
+  margin-bottom: 10px;
 }
 </style>

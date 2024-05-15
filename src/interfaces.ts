@@ -6,5 +6,7 @@ export interface IInterview {
     contactTelegram?: string;
     contactWhatsApp?: string;
     contactPhone?: string;
-    createdAt: Date
+    createdAt: Date;
+    salaryFrom?: number;
+    salaryTo?: number;
 }
