@@ -9,13 +9,16 @@ const db = getFirestore()
 const userStore = useUserStore()
 const route = useRoute()
 
+const isLoading = ref<boolean>(true)
 const interview = ref<IInterview>()
 
 const docref = doc(db, `users/${userStore.userId}/interviews`, route.params.id as string)
 
 const getData = async (): Promise<void> => {
+    isLoading.value = true
     const docSnap = await getDoc(docref)
     interview.value = docSnap.data() as IInterview
+    isLoading.value = false
     console.log(interview.value);
 }
 
@@ -23,7 +26,8 @@ onMounted(async () => await getData())
 </script>
 
 <template>
-    <div class="content-interview">
+    <app-progress v-if="isLoading" />
+    <div class="content-interview" v-else>
         <app-card>
             <template #title>Interview at the company</template>
             <template #content>
