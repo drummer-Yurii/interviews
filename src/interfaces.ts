@@ -9,4 +9,11 @@ export interface IInterview {
     createdAt: Date;
     salaryFrom?: number;
     salaryTo?: number;
+    stages?: IStage[];
+}
+
+export interface IStage {
+    name: string;
+    date: string;
+    description: string;
 }

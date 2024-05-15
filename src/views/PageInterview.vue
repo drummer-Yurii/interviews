@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { useUserStore } from '@/stores/user'
-import { IInterview } from '@/interfaces'
+import type { IInterview, IStage } from '@/interfaces'
 
 const db = getFirestore()
 const userStore = useUserStore()
@@ -20,6 +20,23 @@ const getData = async (): Promise<void> => {
   interview.value = docSnap.data() as IInterview
   isLoading.value = false
   console.log(interview.value)
+}
+
+const addStage = () => {
+    if (interview.value) {
+        if (!interview.value.stages) {
+            interview.value.stages = []
+        }
+        interview.value.stages.push({ name: '', date: '', description: ''})
+    }
+}
+
+const removeStage = (index: number) => {
+    if (interview.value) {
+        if (interview.value.stages) {
+            interview.value.stages.splice(index, 1)
+        }
+    }
 }
 
 onMounted(async () => await getData())
@@ -79,22 +96,35 @@ onMounted(async () => await getData())
             />
           </div>
         </div>
-        <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" />
-        <div class="interview-stage">
-          <div class="flex flex-column gap-2">
-            <label for="stageName">Name stage</label>
-            <app-input-text class="input mb-3" id="stageName" />
+
+        <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" @click="addStage" />
+        <template v-if="interview.stages">
+          <div v-for="(stage, index) in interview.stages" :key="index" class="interview-stage">
+            <div class="flex flex-column gap-2">
+              <label :for="`stage-name-${index}`">Name stage</label>
+              <app-input-text class="input mb-3" :id="`stage-name-${index}`" v-model="stage.name" />
+            </div>
+            <div class="flex flex-column gap-2">
+              <label :for="`stage-date-${index}`">Date of completion of the stage</label>
+              <app-calendar
+                class="input mb-3"
+                :id="`stage-date-${index}`"
+                dateFormat="dd.mm.yy"
+                v-model="stage.date"
+              />
+            </div>
+            <div class="flex flex-column gap-2">
+              <label :for="`stage-description-${index}`">Comment</label>
+              <app-textarea
+                :id="`stage-description-${index}`"
+                class="input mb-3"
+                rows="5"
+                v-model="stage.description"
+              />
+            </div>
+            <app-button severity="danger" label="Delete stage" @click="removeStage" />
           </div>
-          <div class="flex flex-column gap-2">
-            <label for="stageCalendar">Date of completion of the stage</label>
-            <app-calendar class="input mb-3" id="stageCalendar" dateFormat="dd.mm.yy" />
-          </div>
-          <div class="flex flex-column gap-2">
-            <label for="stageDescription">Comment</label>
-            <app-textarea id="stageDescription" class="input mb-3" rows="5" />
-          </div>
-          <app-button severity="danger" label="Delete stage" />
-        </div>
+        </template>
         <div class="flex flex-wrap gap-3 mb-3">
           <div class="flex align-items-center">
             <app-radio inputId="interviewResult1" name="result" value="Refusal" />
