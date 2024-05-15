@@ -31,6 +31,15 @@
                     <label for="contactPhone">Phone HR</label>
                     <app-input-text class="input mb-3" id="contactPhone" />
                 </div>
+                <div class="flex flex-wrap gap-3 p-fluid mb-3">
+                    <div class="flex-auto">
+                        <app-input-number inputId="salaryFrom" placeholder="Salary range from" />
+                    </div>
+                    <div class="flex-auto">
+                        <app-input-number inputId="salaryTo" placeholder="Salary range to" />
+                    </div>
+                </div>
+                <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" />
             </template>
         </app-card>
     </div>
