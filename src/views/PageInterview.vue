@@ -4,6 +4,7 @@ import { useRoute } from 'vue-router'
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore'
 import { useUserStore } from '@/stores/user'
 import type { IInterview, IStage } from '@/interfaces'
+import dayjs from 'dayjs'
 
 const db = getFirestore()
 const userStore = useUserStore()
@@ -22,20 +23,33 @@ const getData = async (): Promise<void> => {
   console.log(interview.value)
 }
 
+const saveInterview = async (): Promise<void> => {
+    isLoading.value = true
+    await updateDoc(docref, {...interview.value})
+    await getData()
+}
+
 const addStage = () => {
-    if (interview.value) {
-        if (!interview.value.stages) {
-            interview.value.stages = []
-        }
-        interview.value.stages.push({ name: '', date: '', description: ''})
+  if (interview.value) {
+    if (!interview.value.stages) {
+      interview.value.stages = []
     }
+    interview.value.stages.push({ name: '', date: '', description: '' })
+  }
 }
 
 const removeStage = (index: number) => {
-    if (interview.value) {
-        if (interview.value.stages) {
-            interview.value.stages.splice(index, 1)
-        }
+  if (interview.value) {
+    if (interview.value.stages) {
+      interview.value.stages.splice(index, 1)
+    }
+  }
+}
+
+const saveDateStage = (index: number) => {
+    if (interview.value?.stages && interview.value.stages.length) {
+        const date = interview.value.stages[index].date
+        interview.value.stages[index].date = dayjs(date).format('DD.MM.YYYY')
     }
 }
 
@@ -97,7 +111,13 @@ onMounted(async () => await getData())
           </div>
         </div>
 
-        <app-button label="Add stage" severity="info" icon="pi pi-plus" class="mb-3" @click="addStage" />
+        <app-button
+          label="Add stage"
+          severity="info"
+          icon="pi pi-plus"
+          class="mb-3"
+          @click="addStage"
+        />
         <template v-if="interview.stages">
           <div v-for="(stage, index) in interview.stages" :key="index" class="interview-stage">
             <div class="flex flex-column gap-2">
@@ -110,6 +130,7 @@ onMounted(async () => await getData())
                 class="input mb-3"
                 :id="`stage-date-${index}`"
                 dateFormat="dd.mm.yy"
+                @date-select="saveDateStage(index)"
                 v-model="stage.date"
               />
             </div>
@@ -125,17 +146,28 @@ onMounted(async () => await getData())
             <app-button severity="danger" label="Delete stage" @click="removeStage" />
           </div>
         </template>
+
         <div class="flex flex-wrap gap-3 mb-3">
           <div class="flex align-items-center">
-            <app-radio inputId="interviewResult1" name="result" value="Refusal" />
+            <app-radio
+              inputId="interviewResult1"
+              name="result"
+              value="Refusal"
+              v-model="interview.result"
+            />
             <label for="interviewResult1" class="ml-2">Refusal</label>
           </div>
           <div class="flex align-items-center">
-            <app-radio inputId="interviewResult2" name="result" value="Offer" />
+            <app-radio
+              inputId="interviewResult2"
+              name="result"
+              value="Offer"
+              v-model="interview.result"
+            />
             <label for="interviewResult2" class="ml-2">Offer</label>
           </div>
         </div>
-        <app-button label="Save" icon="pi pi-save" />
+        <app-button label="Save" icon="pi pi-save" @click="saveInterview" />
       </template>
     </app-card>
   </div>
