@@ -58,7 +58,9 @@ onMounted(async () => {
 <template>
   <app-dialog />
   <app-progress v-if="isLoading" />
-  <app-message v-else-if="!isLoading && !interviews.length" severity="info">No added interviews!</app-message>
+  <app-message v-else-if="!isLoading && !interviews.length" severity="info"
+    >No added interviews!</app-message
+  >
   <div v-else>
     <h1>List of interviews</h1>
     <app-datatable :value="interviews">
@@ -66,7 +68,7 @@ onMounted(async () => {
       <app-column field="hrName" header="Name HR"></app-column>
       <app-column field="vacancyLink" header="Vacancy">
         <template #body="slotProps">
-          <a :href="slotProps.data.vacancyLink" target="_blank">{{ slotProps.data.vacancyLink }}</a>
+          <a :href="slotProps.data.vacancyLink" target="_blank">Link on Vacancy</a>
         </template>
       </app-column>
       <app-column header="Contacts">
@@ -97,6 +99,37 @@ onMounted(async () => {
               <span class="contacts__icon pi pi-phone"></span>
             </a>
           </div>
+        </template>
+      </app-column>
+      <app-column header="completed stages">
+        <template #body="slotProps">
+          <span v-if="!slotProps.data.stages">Not filled in</span>
+          <div v-else class="interview-stages">
+            <app-badge
+              v-for="(stage, i) in slotProps.data.stages"
+              :key="i"
+              :value="i + 1"
+              rounded
+              v-tooltip.top="stage.name"
+            />
+          </div>
+        </template>
+      </app-column>
+      <app-column header="Salary">
+        <template #body="slotProps">
+          <span v-if="!slotProps.data.salaryFrom">Not filled in</span>
+          <span v-else>{{ slotProps.data.salaryFrom }} - {{ slotProps.data.salaryTo }}</span>
+        </template>
+      </app-column>
+      <app-column header="Result">
+        <template #body="slotProps">
+          <span v-if="!slotProps.data.result">Not filled in</span>
+          <template v-else>
+            <app-badge
+              :severity="slotProps.data.result === 'Offer' ? 'success' : 'danger'"
+              :value="slotProps.data.result === 'Offer' ? 'Offer' : 'Refusal'"
+            />
+          </template>
         </template>
       </app-column>
       <app-column>
