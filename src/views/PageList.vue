@@ -7,7 +7,8 @@ import {
   orderBy,
   getDocs,
   deleteDoc,
-  doc
+  doc,
+  where
 } from 'firebase/firestore'
 import { useUserStore } from '@/stores/user'
 import type { IInterview } from '@/interfaces'
@@ -19,12 +20,35 @@ const confirm = useConfirm()
 
 const interviews = ref<IInterview[]>([])
 const isLoading = ref<boolean>(true)
+const selectedFilterResult = ref<string>('')
 
-const getAllInterviews = async <T extends IInterview>(): Promise<T[]> => {
-  const getData = query(
-    collection(db, `users/${userStore.userId}/interviews`),
-    orderBy('createdAt', 'desc')
-  )
+const submitFilter = async (): Promise<void> => {
+  isLoading.value = true
+  const listInterviews: Array<IInterview> = await getAllInterviews(true)
+  interviews.value = listInterviews
+  isLoading.value = false
+}
+const clearFilter = async (): Promise<void> => {
+  isLoading.value = true
+  const listInterviews: Array<IInterview> = await getAllInterviews()
+  interviews.value = listInterviews
+  isLoading.value = false
+}
+
+const getAllInterviews = async <T extends IInterview>(isFilter?: boolean): Promise<T[]> => {
+  let getData
+  if (isFilter) {
+    getData = query(
+      collection(db, `users/${userStore.userId}/interviews`),
+      orderBy('createdAt', 'desc'),
+      where('result', '==', selectedFilterResult.value)
+    )
+  } else {
+    getData = query(
+      collection(db, `users/${userStore.userId}/interviews`),
+      orderBy('createdAt', 'desc')
+    )
+  }
   const listDocs = await getDocs(getData)
   return listDocs.docs.map((doc) => doc.data() as T)
 }
@@ -63,6 +87,30 @@ onMounted(async () => {
   >
   <div v-else>
     <h1>List of interviews</h1>
+    <div class="flex align-items-center mb-5">
+      <div class="flex flex-wrap gap-3 mb-3">
+        <div class="flex align-items-center mr-2">
+          <app-radio
+            inputId="interviewResult1"
+            name="result"
+            value="Refusal"
+            v-model="selectedFilterResult"
+          />
+          <label for="interviewResult1" class="ml-2">Refusal</label>
+        </div>
+        <div class="flex align-items-center mr-2">
+          <app-radio
+            inputId="interviewResult2"
+            name="result"
+            value="Offer"
+            v-model="selectedFilterResult"
+          />
+          <label for="interviewResult2" class="ml-2">Offer</label>
+        </div>
+        <app-button class="mr-2" @click="submitFilter" :disabled="!selectedFilterResult">Apply</app-button>
+        <app-button severity="danger" :disabled="!selectedFilterResult" @click="clearFilter">Reset</app-button>
+      </div>
+    </div>
     <app-datatable :value="interviews">
       <app-column field="company" header="Company"></app-column>
       <app-column field="hrName" header="Name HR"></app-column>
